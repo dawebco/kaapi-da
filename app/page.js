@@ -6,6 +6,7 @@ import KaapiLoader from '@/components/KaapiLoader';
 import KaapiNav from '@/components/KaapiNav';
 import KaapiSections from '@/components/KaapiSections';
 import KaapiStickyOrder from '@/components/KaapiStickyOrder';
+import KaapiFlavorBadge from '@/components/KaapiFlavorBadge';
 import { KAAPI_CLIPS, KAAPI_THEME, FRAMES_PER_CLIP } from '@/lib/kaapi-assets';
 import { captureClip, loadFrameBitmap } from '@/lib/kaapi-frame-capture';
 import { ensureCacheVersion, getCachedFrame } from '@/lib/kaapi-idb';
@@ -13,7 +14,7 @@ import { canRunCinema, prefersReducedMotion } from '@/lib/kaapi-device';
 import { activeActIndex, getScrollProgress } from '@/lib/kaapi-scroll-engine';
 
 const App = () => {
-  const [phase, setPhase] = useState('checking'); // checking | capturing | loading-bitmaps | ready
+  const [phase, setPhase] = useState('checking');
   const [progress, setProgress] = useState(0);
   const [label, setLabel] = useState('Checking cache');
   const [reduced, setReduced] = useState(false);
@@ -43,8 +44,8 @@ const App = () => {
         for (let i = 0; i < clipEntries.length; i++) {
           if (cancelled) return;
           const [clipId, url] = clipEntries[i];
-          setLabel(`Capturing ${clipId}`);
-          const perClipBase = (i / total) * 0.85; // reserve 15% for bitmap load
+          setLabel(`Composing ${clipId}`);
+          const perClipBase = (i / total) * 0.85;
           await captureClip(clipId, url, (frac) => {
             const p = perClipBase + (frac / total) * 0.85;
             setProgress(p);
@@ -52,7 +53,6 @@ const App = () => {
         }
         if (cancelled) return;
 
-        // Load bitmaps into memory
         setLabel('Warming frames');
         const store = {};
         const clipIds = Object.keys(KAAPI_CLIPS);
@@ -85,7 +85,6 @@ const App = () => {
     return () => { cancelled = true; };
   }, []);
 
-  // Track active act for sticky CTA + overlay lighting
   useEffect(() => {
     if (typeof window === 'undefined') return;
     let raf = 0;
@@ -105,17 +104,15 @@ const App = () => {
 
   return (
     <main className="relative min-h-screen w-full text-white" style={pageStyle}>
-      {/* Loader */}
       <KaapiLoader phase={phase} progress={progress} label={label} />
 
-      {/* Fixed background canvas OR static reduced-motion hero */}
       {!reduced ? (
         <KaapiCanvas bitmaps={bitmaps} />
       ) : (
         <div
           className="fixed inset-0 z-0"
           style={{
-            background: `radial-gradient(ellipse at 50% 55%, ${KAAPI_THEME.colors.accentDeep} 0%, #0B0714 45%, #070708 80%)`,
+            background: `radial-gradient(ellipse at 50% 55%, ${KAAPI_THEME.colors.accentDeep} 0%, #0B0714 45%, #050506 80%)`,
           }}
         >
           <div className="absolute inset-0 flex items-center justify-center">
@@ -130,17 +127,14 @@ const App = () => {
         </div>
       )}
 
-      {/* Lighting overlays */}
-      <div
-        className="pointer-events-none fixed inset-0 z-[5]"
-        style={{ background: KAAPI_THEME.glow.floor, mixBlendMode: 'screen' }}
-      />
+      {/* Lighting overlays (kept minimal now that frames carry their own lighting) */}
       <div
         className="pointer-events-none fixed inset-0 z-[6]"
         style={{ background: KAAPI_THEME.glow.vignette }}
       />
 
       <KaapiNav />
+      <KaapiFlavorBadge />
 
       <div className="relative z-10">
         <KaapiSections />

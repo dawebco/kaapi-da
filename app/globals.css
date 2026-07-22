@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --kaapi-bg: #070708;
-  --kaapi-accent: #7C4DFF;
-  --kaapi-accent-deep: #4B1EB8;
-  --kaapi-accent-soft: #B79CFF;
+  --kaapi-bg: #050506;
+  --kaapi-accent: #8B5CFF;
+  --kaapi-accent-deep: #3D179B;
+  --kaapi-accent-soft: #C7ADFF;
 }
 
 html, body {
@@ -24,40 +24,39 @@ html, body {
   letter-spacing: -0.005em;
 }
 
-/* Set page height so scroll spans 6 acts × ~1 viewport each */
-main {
-  /* content sections already stack to ~600vh via min-h-screen × 6 */
+@keyframes kaapiPulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.25); }
 }
 
-/* Custom scrollbar (subtle, purple) */
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #0a0a0d; }
+::-webkit-scrollbar-track { background: #08080c; }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #7C4DFF, #4B1EB8);
+  background: linear-gradient(180deg, #8B5CFF, #3D179B);
   border-radius: 8px;
 }
 
 @layer base {
   :root {
-    --background: 240 6% 4%;
+    --background: 240 8% 3%;
     --foreground: 240 5% 98%;
     --card: 240 6% 6%;
     --card-foreground: 240 5% 98%;
     --popover: 240 6% 6%;
     --popover-foreground: 240 5% 98%;
-    --primary: 258 100% 65%;
+    --primary: 262 100% 68%;
     --primary-foreground: 240 5% 98%;
     --secondary: 240 5% 12%;
     --secondary-foreground: 240 5% 98%;
     --muted: 240 5% 12%;
     --muted-foreground: 240 5% 65%;
-    --accent: 258 100% 65%;
+    --accent: 262 100% 68%;
     --accent-foreground: 240 5% 98%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 240 5% 98%;
     --border: 240 5% 15%;
     --input: 240 5% 15%;
-    --ring: 258 100% 65%;
+    --ring: 262 100% 68%;
     --radius: 0.75rem;
   }
 }
