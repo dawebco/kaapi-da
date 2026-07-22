@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --kaapi-bg: #070708;
+  --kaapi-accent: #7C4DFF;
+  --kaapi-accent-deep: #4B1EB8;
+  --kaapi-accent-soft: #B79CFF;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--kaapi-bg);
+  color: #FDFCFF;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-anton {
+  font-family: var(--font-anton), 'Impact', 'Oswald', sans-serif;
+  letter-spacing: -0.005em;
+}
+
+/* Set page height so scroll spans 6 acts × ~1 viewport each */
+main {
+  /* content sections already stack to ~600vh via min-h-screen × 6 */
+}
+
+/* Custom scrollbar (subtle, purple) */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0a0a0d; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #7C4DFF, #4B1EB8);
+  border-radius: 8px;
+}
+
+@layer base {
+  :root {
+    --background: 240 6% 4%;
+    --foreground: 240 5% 98%;
+    --card: 240 6% 6%;
+    --card-foreground: 240 5% 98%;
+    --popover: 240 6% 6%;
+    --popover-foreground: 240 5% 98%;
+    --primary: 258 100% 65%;
+    --primary-foreground: 240 5% 98%;
+    --secondary: 240 5% 12%;
+    --secondary-foreground: 240 5% 98%;
+    --muted: 240 5% 12%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 258 100% 65%;
+    --accent-foreground: 240 5% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 240 5% 98%;
+    --border: 240 5% 15%;
+    --input: 240 5% 15%;
+    --ring: 258 100% 65%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+}
