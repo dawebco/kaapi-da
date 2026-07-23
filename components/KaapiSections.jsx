@@ -48,15 +48,15 @@ export default function KaapiSections({ theme }) {
   return (
     <>
       {/* ACT 1 — HERO */}
-      <section id="hero" className="relative min-h-screen w-full flex items-center px-6 pt-24">
+      <section id="hero" className="relative min-h-screen w-full flex items-center px-4 sm:px-8 pt-24">
         <Watermark text="KAAPI" isDark={isDark} />
-        <div className="w-full max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           <motion.div {...fadeUp} className="max-w-xl">
             <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${cardBorder} ${cardBg} backdrop-blur`}>
               <span className="h-1.5 w-1.5 rounded-full" style={{ background: kickerColor, boxShadow: `0 0 12px ${kickerColor}` }} />
               <span className={`text-[10px] uppercase tracking-[0.38em] ${inkMute}`}>{KAAPI_COPY.hero.eyebrow}</span>
             </div>
-            <h1 className={`font-anton mt-6 leading-[0.88] ${ink} text-5xl md:text-7xl lg:text-8xl`}>
+            <h1 className={`font-anton mt-6 leading-tight md:leading-[0.88] ${ink} text-5xl md:text-7xl lg:text-8xl`}>
               {KAAPI_COPY.hero.headline}<br />
               <span className="opacity-85">{KAAPI_COPY.hero.headlineB}</span>
             </h1>
@@ -70,13 +70,13 @@ export default function KaapiSections({ theme }) {
       </section>
 
       {/* ACT 2 — INGREDIENTS */}
-      <section id="ingredients" className="relative min-h-screen w-full flex items-center px-6">
+      <section id="ingredients" className="relative min-h-screen w-full flex items-center px-4 sm:px-8">
         <Watermark text="BERRY" isDark={isDark} />
-        <div className="w-full max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           <div className="hidden md:block" />
           <motion.div {...fadeUp} className="max-w-md ml-auto">
             <Eyebrow>{KAAPI_COPY.ingredients.eyebrow}</Eyebrow>
-            <h2 className={`font-anton text-4xl md:text-5xl leading-[0.95] ${ink} mt-3`}>{KAAPI_COPY.ingredients.headline}</h2>
+            <h2 className={`font-anton text-4xl md:text-5xl leading-tight md:leading-[0.95] ${ink} mt-3`}>{KAAPI_COPY.ingredients.headline}</h2>
             <p className={`${inkMute} text-sm md:text-base max-w-md mt-4 leading-relaxed`}>{KAAPI_COPY.ingredients.sub}</p>
             <div className="mt-8 grid gap-3">
               {KAAPI_COPY.ingredients.cards.map((c, i) => (
@@ -101,18 +101,18 @@ export default function KaapiSections({ theme }) {
       </section>
 
       {/* ACT 3 — BREW */}
-      <section id="brew" className="relative min-h-screen w-full px-6 flex flex-col justify-between py-24">
+      <section id="brew" className="relative min-h-screen w-full px-4 sm:px-8 flex flex-col justify-between py-24">
         <Watermark text="BREW" isDark={isDark} />
         <motion.div {...fadeUp} className="w-full max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
               <Eyebrow>{KAAPI_COPY.brew.eyebrow}</Eyebrow>
-              <h2 className={`font-anton text-4xl md:text-5xl leading-[0.95] ${ink} mt-3`}>{KAAPI_COPY.brew.headline}</h2>
+              <h2 className={`font-anton text-4xl md:text-5xl leading-tight md:leading-[0.95] ${ink} mt-3`}>{KAAPI_COPY.brew.headline}</h2>
             </div>
             <p className={`${inkMute} text-sm md:text-base max-w-sm`}>{KAAPI_COPY.brew.sub}</p>
           </div>
         </motion.div>
-        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {KAAPI_COPY.brew.cols.map((c, i) => (
             <motion.div key={c.k}
               initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
@@ -127,12 +127,12 @@ export default function KaapiSections({ theme }) {
       </section>
 
       {/* ACT 4 — DROP */}
-      <section id="drop" className="relative min-h-screen w-full flex items-center px-6">
+      <section id="drop" className="relative min-h-screen w-full flex items-center px-4 sm:px-8">
         <Watermark text="PANJIM" isDark={isDark} />
-        <div className="w-full max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           <motion.div {...fadeUp} className="max-w-md">
             <Eyebrow>{KAAPI_COPY.drop.eyebrow}</Eyebrow>
-            <h2 className={`font-anton text-4xl md:text-5xl leading-[0.95] ${ink} mt-3`}>{KAAPI_COPY.drop.headline}</h2>
+            <h2 className={`font-anton text-4xl md:text-5xl leading-tight md:leading-[0.95] ${ink} mt-3`}>{KAAPI_COPY.drop.headline}</h2>
             <p className={`${inkMute} text-sm md:text-base max-w-md mt-4 leading-relaxed`}>{KAAPI_COPY.drop.sub}</p>
             <div className={`${glass} mt-8 inline-flex items-center gap-3 px-4 py-3`}>
               <MapPin size={18} style={{ color: kickerColor }} />
@@ -147,13 +147,13 @@ export default function KaapiSections({ theme }) {
       </section>
 
       {/* ACT 5 — ORDER (no CTA — sticky bottom-right handles it) */}
-      <section id="order" className="relative min-h-screen w-full flex items-center px-6">
+      <section id="order" className="relative min-h-screen w-full flex items-center px-4 sm:px-8">
         <Watermark text="ORDER" isDark={isDark} />
-        <div className="w-full max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           <div className="hidden md:block" />
           <motion.div {...fadeUp} className="max-w-md ml-auto">
             <Eyebrow>{KAAPI_COPY.order.eyebrow}</Eyebrow>
-            <h2 className={`font-anton text-5xl md:text-6xl leading-[0.9] ${ink} mt-3`}>
+            <h2 className={`font-anton text-5xl md:text-6xl leading-tight md:leading-[0.9] ${ink} mt-3`}>
               {KAAPI_COPY.order.headline}<br />
               <span className="opacity-85">{KAAPI_COPY.order.headlineB}</span>
             </h2>
@@ -166,11 +166,11 @@ export default function KaapiSections({ theme }) {
       </section>
 
       {/* ACT 6 — OUTRO */}
-      <section id="outro" className="relative min-h-screen w-full flex flex-col justify-between px-6 py-28">
+      <section id="outro" className="relative min-h-screen w-full flex flex-col justify-between px-4 sm:px-8 py-28">
         <Watermark text="KAAPI" isDark={isDark} />
         <motion.div {...fadeUp} className="w-full max-w-4xl mx-auto text-center">
           <Eyebrow>{KAAPI_COPY.outro.eyebrow}</Eyebrow>
-          <h2 className={`font-anton text-5xl md:text-7xl leading-[0.9] ${ink} mt-3`}>{KAAPI_COPY.outro.headline}</h2>
+          <h2 className={`font-anton text-5xl md:text-7xl leading-tight md:leading-[0.9] ${ink} mt-3`}>{KAAPI_COPY.outro.headline}</h2>
           <p className={`${inkMute} text-base md:text-lg mt-5 max-w-lg mx-auto`}>{KAAPI_COPY.outro.sub}</p>
         </motion.div>
         <div className="w-full max-w-3xl mx-auto">

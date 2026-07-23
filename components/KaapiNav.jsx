@@ -14,9 +14,9 @@ export default function KaapiNav({ theme, onToggleTheme }) {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-30 pointer-events-none">
-      <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between pointer-events-auto">
+      <div className="mx-auto max-w-7xl px-4 sm:px-8 py-4 flex items-center justify-between pointer-events-auto">
         {/* Left — Kaapi Da logo */}
-        <a href="#hero" className={`flex items-center gap-3 rounded-full pl-1.5 pr-4 py-1 border ${border} ${bg} backdrop-blur-md`}>
+        <a href="#hero" className={`flex items-center gap-3 rounded-full pl-1.5 pr-4 py-1.5 border ${border} ${bg} backdrop-blur-md`}>
           <span className="h-8 w-8 rounded-full overflow-hidden bg-white flex items-center justify-center">
             <Image src={KAAPI_LOGO} alt="Kaapi Da" width={32} height={32} className="h-8 w-8 object-cover" />
           </span>
@@ -41,7 +41,7 @@ export default function KaapiNav({ theme, onToggleTheme }) {
         <button
           onClick={onToggleTheme}
           aria-label="Toggle theme"
-          className={`h-10 w-10 flex items-center justify-center rounded-full border ${border} ${bg} backdrop-blur-md ${ink} transition hover:scale-105`}
+          className={`h-11 w-11 flex items-center justify-center rounded-full border ${border} ${bg} backdrop-blur-md ${ink} transition hover:scale-105`}
         >
           {isDark ? <Sun size={16} /> : <Moon size={16} />}
         </button>

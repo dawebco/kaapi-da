@@ -119,7 +119,7 @@ export default function KaapiCanvas({ bitmaps, themeBg }) {
   }, [bitmaps]);
 
   return (
-    <div ref={wrapperRef} className="fixed inset-0 z-0 will-change-transform"
+    <div ref={wrapperRef} className="fixed inset-0 z-0 pointer-events-none will-change-transform"
       style={{ transformStyle: 'preserve-3d', transformOrigin: '50% 50%' }}>
       <canvas ref={canvasRef} className="w-screen h-screen block" style={{ background: themeBg || '#050506' }} aria-hidden="true" />
     </div>
