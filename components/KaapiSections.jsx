@@ -33,9 +33,9 @@ export default function KaapiSections({ theme }) {
   const ink = isDark ? 'text-white' : 'text-[#1B1710]';
   const inkMute = isDark ? 'text-white/70' : 'text-[#5C4F3F]';
   const inkDim = isDark ? 'text-white/50' : 'text-[#5C4F3F]/70';
-  const cardBg = isDark ? 'bg-white/[0.04]' : 'bg-black/[0.03]';
-  const cardBorder = isDark ? 'border-white/10' : 'border-black/10';
-  const iconBg = isDark ? 'bg-[#8B5CFF]/18' : 'bg-[#8A5A3C]/15';
+  const cardBg = isDark ? 'bg-[#8B5CFF]/12' : 'bg-[#8A5A3C]/12';
+  const cardBorder = isDark ? 'border-[#8B5CFF]/40' : 'border-[#8A5A3C]/40';
+  const iconBg = isDark ? 'bg-[#8B5CFF]/30' : 'bg-[#8A5A3C]/25';
   const iconTxt = isDark ? 'text-[#C7ADFF]' : 'text-[#4A2A15]';
   const kickerColor = isDark ? '#C7ADFF' : '#8A5A3C';
 
@@ -73,8 +73,7 @@ export default function KaapiSections({ theme }) {
       <section id="ingredients" className="relative min-h-screen w-full flex items-center px-4 sm:px-8">
         <Watermark text="BERRY" isDark={isDark} />
         <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className="hidden md:block" />
-          <motion.div {...fadeUp} className="max-w-md ml-auto">
+          <motion.div {...fadeUp} className="max-w-md">
             <Eyebrow>{KAAPI_COPY.ingredients.eyebrow}</Eyebrow>
             <h2 className={`font-anton text-4xl md:text-5xl leading-tight md:leading-[0.95] ${ink} mt-3`}>{KAAPI_COPY.ingredients.headline}</h2>
             <p className={`${inkMute} text-sm md:text-base max-w-md mt-4 leading-relaxed`}>{KAAPI_COPY.ingredients.sub}</p>
@@ -97,6 +96,7 @@ export default function KaapiSections({ theme }) {
               ))}
             </div>
           </motion.div>
+          <div className="hidden md:block" />
         </div>
       </section>
 

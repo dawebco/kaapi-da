@@ -27,7 +27,7 @@ export default function KaapiNav({ theme, onToggleTheme }) {
         <div className={`hidden md:flex items-center gap-1 rounded-full border ${border} ${bg} backdrop-blur-md px-1.5 py-1.5`}>
           {[
             { label: 'Brew', href: '#brew' },
-            { label: 'Panjim', href: '#drop' },
+            { label: 'Ingredients', href: '#ingredients' },
             { label: 'Order', href: '#order' },
           ].map((it) => (
             <a key={it.label} href={it.href}

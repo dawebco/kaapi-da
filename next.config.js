@@ -1,5 +1,6 @@
 const nextConfig = {
   output: 'standalone',
+  reactStrictMode: false,
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -18,6 +19,9 @@ const nextConfig = {
         ignored: ['**/node_modules'],
       };
     }
+    // Increase chunk load timeout from default 120s to prevent ChunkLoadError hangs
+    config.output = config.output || {};
+    config.output.chunkLoadTimeout = 60000;
     return config;
   },
   onDemandEntries: {

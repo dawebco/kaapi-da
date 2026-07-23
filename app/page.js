@@ -5,20 +5,26 @@ import KaapiCanvas from '@/components/KaapiCanvas';
 import KaapiNav from '@/components/KaapiNav';
 import KaapiSections from '@/components/KaapiSections';
 import KaapiStickyOrder from '@/components/KaapiStickyOrder';
-import KaapiActNav from '@/components/KaapiActNav';
 import KaapiFlavorCarousel from '@/components/KaapiFlavorCarousel';
-import { KAAPI_THEMES, FRAMES_PER_CLIP, KAAPI_SEGMENTS, getTheme } from '@/lib/kaapi-assets';
+import KaapiLoader from '@/components/KaapiLoader';
+import { KAAPI_THEMES, FRAMES_PER_CLIP, getTheme } from '@/lib/kaapi-assets';
 import { captureClipForTheme, loadFrameBitmap } from '@/lib/kaapi-frame-capture';
 import { ensureCacheVersion, getCachedFrame } from '@/lib/kaapi-idb';
 import { canRunCinema } from '@/lib/kaapi-device';
 import { getActAnchor, activeActIndex, getScrollProgress } from '@/lib/kaapi-scroll-engine';
 
 const CLIP_IDS = ['deconstruct', 'orbit', 'bridge', 'detail'];
+const TOTAL_STEPS = CLIP_IDS.length * FRAMES_PER_CLIP; // 4 × 32 = 128
 
-async function warmTheme(themeId, cancelRef) {
+async function warmTheme(themeId, cancelRef, onStep) {
+  let stepsDone = 0;
   for (const clipId of CLIP_IDS) {
     if (cancelRef && cancelRef.cancelled) return null;
-    await captureClipForTheme(themeId, clipId);
+    await captureClipForTheme(themeId, clipId, (p) => {
+      // p is 0..1 per clip — map to global steps
+      onStep && onStep(stepsDone + Math.round(p * FRAMES_PER_CLIP));
+    });
+    stepsDone += FRAMES_PER_CLIP;
   }
   const store = {};
   for (const clipId of CLIP_IDS) {
@@ -33,15 +39,20 @@ async function warmTheme(themeId, cancelRef) {
 }
 
 const App = () => {
-  const [themeId, setThemeId] = useState('dark');
+  // Default to LIGHT theme — no FOUC
+  const [themeId, setThemeId] = useState('light');
   const [bitmaps, setBitmaps] = useState(null);
   const [reduced, setReduced] = useState(false);
-  const bitmapsCacheRef = useRef({}); // { themeId: bitmaps }
+  // Loader state: 0..1 progress float
+  const [loadProgress, setLoadProgress] = useState(0);
+  const [loaderDone, setLoaderDone] = useState(false);
+  const bitmapsCacheRef = useRef({});
   const prefetchInFlightRef = useRef({});
+  const failsafeRef = useRef(null);
 
   const theme = useMemo(() => getTheme(themeId), [themeId]);
 
-  // Persisted theme
+  // Persisted theme — only override if user previously set a preference
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const saved = window.localStorage.getItem('kaapi-theme');
@@ -51,30 +62,62 @@ const App = () => {
     if (typeof window !== 'undefined') window.localStorage.setItem('kaapi-theme', themeId);
   }, [themeId]);
 
+  // Detect reduced motion / IndexedDB support
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!canRunCinema()) { setReduced(true); return; }
     ensureCacheVersion().catch(() => setReduced(true));
   }, []);
 
-  // Warm current theme
+  // Hard failsafe: dismiss loader after 4 seconds no matter what
+  const dismissLoader = () => {
+    setLoadProgress(1);
+    if (failsafeRef.current) clearTimeout(failsafeRef.current);
+    setTimeout(() => setLoaderDone(true), 500); // match fade-out transition
+  };
+
+  // Warm current theme + drive progress
   useEffect(() => {
-    if (typeof window === 'undefined' || reduced) return;
-    if (bitmapsCacheRef.current[themeId]) { setBitmaps(bitmapsCacheRef.current[themeId]); return; }
+    if (typeof window === 'undefined') return;
+
+    // If reduced motion, dismiss loader after short delay
+    if (reduced) {
+      setLoadProgress(1);
+      setTimeout(() => setLoaderDone(true), 500);
+      return;
+    }
+
+    if (bitmapsCacheRef.current[themeId]) {
+      setBitmaps(bitmapsCacheRef.current[themeId]);
+      dismissLoader();
+      return;
+    }
+
     setBitmaps(null);
+    setLoadProgress(0);
+    setLoaderDone(false);
+
+    // 4-second hard failsafe
+    failsafeRef.current = setTimeout(dismissLoader, 4000);
+
     const cancelRef = { cancelled: false };
     (async () => {
-      const store = await warmTheme(themeId, cancelRef);
+      const store = await warmTheme(themeId, cancelRef, (steps) => {
+        const p = Math.min(0.9, steps / TOTAL_STEPS); // cap at 90% until fully done
+        setLoadProgress(p);
+      });
       if (cancelRef.cancelled || !store) return;
       bitmapsCacheRef.current[themeId] = store;
       setBitmaps(store);
-      // Prefetch the OTHER theme once current is warm and browser idle.
+      dismissLoader();
+
+      // Prefetch the OTHER theme once current is warm and browser idle
       const otherId = themeId === 'dark' ? 'light' : 'dark';
       if (!bitmapsCacheRef.current[otherId] && !prefetchInFlightRef.current[otherId]) {
         prefetchInFlightRef.current[otherId] = true;
         const kickoff = () => {
           (async () => {
-            const other = await warmTheme(otherId, { cancelled: false });
+            const other = await warmTheme(otherId, { cancelled: false }, () => {});
             if (other) bitmapsCacheRef.current[otherId] = other;
             prefetchInFlightRef.current[otherId] = false;
           })();
@@ -85,8 +128,12 @@ const App = () => {
           setTimeout(kickoff, 1500);
         }
       }
-    })().catch(() => setReduced(true));
-    return () => { cancelRef.cancelled = true; };
+    })().catch(() => { setReduced(true); dismissLoader(); });
+
+    return () => {
+      cancelRef.cancelled = true;
+      if (failsafeRef.current) clearTimeout(failsafeRef.current);
+    };
   }, [themeId, reduced]);
 
   // Keyboard navigation: ↑↓, PgUp/PgDn, Home/End jump between acts.
@@ -130,6 +177,9 @@ const App = () => {
 
   return (
     <main className="relative min-h-screen w-full transition-colors duration-500" style={pageStyle}>
+      {/* Full-screen entry loader — z-[100] sits above everything */}
+      {!loaderDone && <KaapiLoader progress={loadProgress} theme={theme} />}
+
       {!reduced ? (
         <KaapiCanvas bitmaps={bitmaps} themeBg={theme.colors.canvasBg} />
       ) : (
@@ -147,14 +197,14 @@ const App = () => {
       }} />
 
       <KaapiNav theme={theme} onToggleTheme={toggleTheme} />
-      <KaapiActNav theme={theme} />
+      {/* KaapiActNav removed — left-side dots cleaned up */}
       <KaapiFlavorCarousel theme={theme} onSelectTheme={(id) => setThemeId(id)} />
 
       <div className="relative z-10">
         <KaapiSections theme={theme} />
       </div>
 
-      <KaapiStickyOrder />
+      <KaapiStickyOrder theme={theme} />
     </main>
   );
 };

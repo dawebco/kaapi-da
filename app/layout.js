@@ -17,6 +17,9 @@ const inter = Inter({
 export const metadata = {
   title: 'Kaapi Da · Bean to Heart',
   description: 'A bold cold-filter coffee, reimagined in blueberry-purple. Order on Swiggy, Panjim, Goa.',
+};
+
+export const viewport = {
   themeColor: '#070708',
 };
 
@@ -26,7 +29,7 @@ export default function RootLayout({ children }) {
       <head>
         <script dangerouslySetInnerHTML={{__html:'window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);'}} />
       </head>
-      <body className="bg-[#070708] text-white font-sans antialiased">
+      <body className="bg-[#FAFAFA] text-[#1A1A1A] font-sans antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>
