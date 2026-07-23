@@ -2,9 +2,14 @@
 
 import { useEffect, useRef } from 'react';
 import { FRAMES_PER_CLIP } from '@/lib/kaapi-assets';
-import { resolveFrame, getScrollProgress } from '@/lib/kaapi-scroll-engine';
+import { resolveFrameBlend, getScrollProgress } from '@/lib/kaapi-scroll-engine';
 import { drawFrame, resizeCanvasToDisplay } from '@/lib/kaapi-renderer';
 
+// Fixed full-screen background canvas driven by scroll.
+// - Cinema color grade via ctx.filter
+// - Velocity-based motion blur during fast scrolls
+// - Subtle 3D mouse-parallax tilt on wrapper
+// - Feathered crossfade near inter-clip segment boundaries
 export default function KaapiCanvas({ bitmaps, themeBg }) {
   const wrapperRef = useRef(null);
   const canvasRef = useRef(null);
@@ -18,10 +23,8 @@ export default function KaapiCanvas({ bitmaps, themeBg }) {
     const onMove = (e) => {
       const cx = window.innerWidth / 2;
       const cy = window.innerHeight / 2;
-      const nx = (e.clientX - cx) / cx;
-      const ny = (e.clientY - cy) / cy;
-      tiltRef.current.tx = Math.max(-1, Math.min(1, nx));
-      tiltRef.current.ty = Math.max(-1, Math.min(1, ny));
+      tiltRef.current.tx = Math.max(-1, Math.min(1, (e.clientX - cx) / cx));
+      tiltRef.current.ty = Math.max(-1, Math.min(1, (e.clientY - cy) / cy));
     };
     const onLeave = () => { tiltRef.current.tx = 0; tiltRef.current.ty = 0; };
     window.addEventListener('mousemove', onMove);
@@ -43,8 +46,21 @@ export default function KaapiCanvas({ bitmaps, themeBg }) {
 
     const onResize = () => { resizeCanvasToDisplay(canvas); lastKeyRef.current = ''; };
     window.addEventListener('resize', onResize);
-
     lastScrollRef.current = window.scrollY || 0;
+
+    const pickBitmap = (clipId, index) => {
+      if (!bitmaps[clipId]) return null;
+      let b = bitmaps[clipId][index];
+      if (b) return b;
+      // walk to nearest available frame
+      for (let d = 1; d < FRAMES_PER_CLIP; d++) {
+        const a = bitmaps[clipId][index - d];
+        const bb = bitmaps[clipId][index + d];
+        if (a) return a;
+        if (bb) return bb;
+      }
+      return null;
+    };
 
     const render = () => {
       if (cancelled) return;
@@ -59,27 +75,35 @@ export default function KaapiCanvas({ bitmaps, themeBg }) {
       const rotY = tiltRef.current.x * 6;
       const rotX = -tiltRef.current.y * 4;
       if (wrapperRef.current) {
-        wrapperRef.current.style.transform = `perspective(1400px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.04)`;
+        wrapperRef.current.style.transform =
+          `perspective(1400px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.04)`;
       }
 
       const p = getScrollProgress();
-      const { clipId, index } = resolveFrame(p);
-      const key = `${clipId}:${index}:${blur.toFixed(2)}`;
-      let chosen = bitmaps[clipId] && bitmaps[clipId][index];
-      if (!chosen && bitmaps[clipId]) {
-        for (let d = 1; d < FRAMES_PER_CLIP; d++) {
-          const a = bitmaps[clipId][index - d];
-          const b = bitmaps[clipId][index + d];
-          if (a) { chosen = a; break; }
-          if (b) { chosen = b; break; }
-        }
-      }
-      if (chosen && key !== lastKeyRef.current) {
+      const { primary, secondary, blend } = resolveFrameBlend(p);
+      const A = pickBitmap(primary.clipId, primary.index);
+      const B = secondary ? pickBitmap(secondary.clipId, secondary.index) : null;
+      // Include blend + secondary key so we redraw during feathered transitions.
+      const key = `${primary.clipId}:${primary.index}:${blur.toFixed(2)}:${blend.toFixed(2)}:${secondary ? secondary.clipId + ':' + secondary.index : '-'}`;
+
+      if (A && key !== lastKeyRef.current) {
         ctx.save();
-        try {
-          ctx.filter = `brightness(1.06) contrast(1.10) saturate(1.15) blur(${blur.toFixed(2)}px)`;
-        } catch { /* older browsers */ }
-        drawFrame(ctx, chosen, canvas.width, canvas.height);
+        try { ctx.filter = `brightness(1.06) contrast(1.10) saturate(1.15) blur(${blur.toFixed(2)}px)`; } catch { /* ok */ }
+        // Draw primary at (1 - blend)
+        ctx.globalAlpha = 1 - blend;
+        drawFrame(ctx, A, canvas.width, canvas.height);
+        if (B && blend > 0) {
+          ctx.globalAlpha = blend;
+          // drawFrame includes clearRect internally — use manual drawImage to avoid clearing primary.
+          const sw = B.width || B.videoWidth || canvas.width;
+          const sh = B.height || B.videoHeight || canvas.height;
+          const bAR = sw / sh, outAR = canvas.width / canvas.height;
+          let dw, dh;
+          if (bAR > outAR) { dh = canvas.height; dw = dh * bAR; }
+          else { dw = canvas.width; dh = dw / bAR; }
+          const dx = (canvas.width - dw) / 2, dy = (canvas.height - dh) / 2;
+          ctx.drawImage(B, dx, dy, dw, dh);
+        }
         ctx.restore();
         lastKeyRef.current = key;
       }
