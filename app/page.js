@@ -99,7 +99,7 @@ const App = () => {
       <div className="pointer-events-none fixed inset-0 z-[6]" style={{
         background: isDark
           ? 'radial-gradient(circle at 50% 50%, rgba(5,5,6,0) 45%, rgba(5,5,6,0.55) 78%, rgba(5,5,6,0.95) 100%)'
-          : 'radial-gradient(circle at 50% 50%, rgba(244,237,224,0) 45%, rgba(244,237,224,0.35) 78%, rgba(244,237,224,0.75) 100%)',
+          : 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0) 55%, rgba(255,255,255,0.20) 80%, rgba(255,255,255,0.60) 100%)',
       }} />
 
       <KaapiNav theme={theme} onToggleTheme={toggleTheme} />
