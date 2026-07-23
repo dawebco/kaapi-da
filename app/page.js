@@ -6,6 +6,7 @@ import KaapiNav from '@/components/KaapiNav';
 import KaapiSections from '@/components/KaapiSections';
 import KaapiStickyOrder from '@/components/KaapiStickyOrder';
 import KaapiActNav from '@/components/KaapiActNav';
+import KaapiFlavorCarousel from '@/components/KaapiFlavorCarousel';
 import { KAAPI_THEMES, FRAMES_PER_CLIP, KAAPI_SEGMENTS, getTheme } from '@/lib/kaapi-assets';
 import { captureClipForTheme, loadFrameBitmap } from '@/lib/kaapi-frame-capture';
 import { ensureCacheVersion, getCachedFrame } from '@/lib/kaapi-idb';
@@ -147,6 +148,7 @@ const App = () => {
 
       <KaapiNav theme={theme} onToggleTheme={toggleTheme} />
       <KaapiActNav theme={theme} />
+      <KaapiFlavorCarousel theme={theme} onSelectTheme={(id) => setThemeId(id)} />
 
       <div className="relative z-10">
         <KaapiSections theme={theme} />
